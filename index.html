@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Chocolate Match</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #ffffff;
+  }
+ 
+  * {
+    box-sizing: border-box;
+  }
+ 
+  .quiz-wrap {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 32px 20px 40px;
+  }
+ 
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+ 
+  .quiz-emoji {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+ 
+  .quiz-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1B3A2F;
+    margin: 0 0 6px;
+    line-height: 1.25;
+  }
+ 
+  .quiz-subtitle {
+    font-size: 14px;
+    color: #5a7568;
+    margin: 0;
+  }
+ 
+  /* Progress */
+  .progress-bar {
+    background: #e8eeec;
+    border-radius: 99px;
+    height: 6px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+ 
+  .progress-fill {
+    background: #1B3A2F;
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+ 
+  /* Question */
+  .question-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #5a7568;
+    margin-bottom: 8px;
+  }
+ 
+  .question-text {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1B3A2F;
+    margin: 0 0 20px;
+    line-height: 1.35;
+  }
+ 
+  /* Options */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+ 
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #ffffff;
+    border: 2px solid #dce8e3;
+    border-radius: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+ 
+  .option-btn:hover {
+    border-color: #1B3A2F;
+    background: #f3f8f5;
+    transform: translateY(-1px);
+  }
+ 
+  .option-btn:active {
+    transform: translateY(0);
+  }
+ 
+  .option-btn.selected {
+    border-color: #1B3A2F;
+    background: #1B3A2F;
+  }
+ 
+  .option-btn.selected .option-label,
+  .option-btn.selected .option-desc {
+    color: #ffffff;
+  }
+ 
+  .option-icon {
+    font-size: 26px;
+    flex-shrink: 0;
+    width: 36px;
+    text-align: center;
+  }
+ 
+  .option-text {
+    flex: 1;
+  }
+ 
+  .option-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1B3A2F;
+    display: block;
+    line-height: 1.2;
+  }
+ 
+  .option-desc {
+    font-size: 12px;
+    color: #5a7568;
+    display: block;
+    margin-top: 2px;
+  }
+ 
+  /* Next button */
+  .next-btn {
+    margin-top: 22px;
+    width: 100%;
+    background: #1B3A2F;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 15px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    display: none;
+  }
+ 
+  .next-btn.visible {
+    display: block;
+  }
+ 
+  .next-btn:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+  }
+ 
+  .next-btn:active {
+    transform: translateY(0);
+  }
+ 
+  /* Result */
+  .result-card {
+    display: none;
+    background: #f3f8f5;
+    border: 2px solid #1B3A2F;
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-align: center;
+    animation: fadeUp 0.35s ease;
+  }
+ 
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+ 
+  .result-card.visible {
+    display: block;
+  }
+ 
+  .result-badge {
+    display: inline-block;
+    background: #1B3A2F;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 99px;
+    padding: 4px 12px;
+    margin-bottom: 14px;
+  }
+ 
+  .result-emoji {
+    font-size: 42px;
+    margin-bottom: 10px;
+  }
+ 
+  .result-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1B3A2F;
+    margin: 0 0 8px;
+    line-height: 1.25;
+  }
+ 
+  .result-desc {
+    font-size: 14px;
+    color: #3d5c4e;
+    margin: 0 0 22px;
+    line-height: 1.55;
+  }
+ 
+  .result-link {
+    display: inline-block;
+    background: #1B3A2F;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 12px;
+    padding: 13px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: opacity 0.2s, transform 0.15s;
+    margin-bottom: 14px;
+  }
+ 
+  .result-link:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+  }
+ 
+  .restart-btn {
+    display: block;
+    background: none;
+    border: none;
+    color: #5a7568;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px;
+    text-decoration: underline;
+    margin: 10px auto 0;
+    font-family: inherit;
+  }
+ 
+  .restart-btn:hover {
+    color: #1B3A2F;
+  }
+ 
+  /* Fade transition between steps */
+  .step {
+    animation: fadeUp 0.3s ease;
+  }
+</style>
+</head>
+<body>
+ 
+<div class="quiz-wrap">
+  <div class="quiz-header">
+    <div class="quiz-emoji">🍫</div>
+    <h2 class="quiz-title">Find Your Perfect Chocolate Match</h2>
+    <p class="quiz-subtitle">Two questions. One delicious answer.</p>
+  </div>
+ 
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+  </div>
+ 
+  <!-- Step 1 -->
+  <div class="step" id="step1">
+    <p class="question-label">Question 1 of 2</p>
+    <p class="question-text">How do you like your chocolate?</p>
+    <div class="options">
+      <button class="option-btn" onclick="selectOption(1, 'chewy', this)">
+        <span class="option-icon">🍫</span>
+        <span class="option-text">
+          <span class="option-label">Rich &amp; chewy</span>
+          <span class="option-desc">Give me something fudgy and indulgent</span>
+        </span>
+      </button>
+      <button class="option-btn" onclick="selectOption(1, 'crunchy', this)">
+        <span class="option-icon">🍪</span>
+        <span class="option-text">
+          <span class="option-label">Crispy &amp; crunchy</span>
+          <span class="option-desc">I love a good snap or crunch</span>
+        </span>
+      </button>
+      <button class="option-btn" onclick="selectOption(1, 'sippable', this)">
+        <span class="option-icon">☕</span>
+        <span class="option-text">
+          <span class="option-label">Warm &amp; sippable</span>
+          <span class="option-desc">Mug in hand, ready to wind down</span>
+        </span>
+      </button>
+    </div>
+    <button class="next-btn" id="next1" onclick="goToStep2()">Next &rarr;</button>
+  </div>
+ 
+  <!-- Step 2 -->
+  <div class="step" id="step2" style="display:none;">
+    <p class="question-label">Question 2 of 2</p>
+    <p class="question-text">What kind of experience are you after?</p>
+    <div class="options">
+      <button class="option-btn" onclick="selectOption(2, 'gentle', this)">
+        <span class="option-icon">🌱</span>
+        <span class="option-text">
+          <span class="option-label">Easy &amp; approachable</span>
+          <span class="option-desc">I like to keep things gentle and chill</span>
+        </span>
+      </button>
+      <button class="option-btn" onclick="selectOption(2, 'bold', this)">
+        <span class="option-icon">🔥</span>
+        <span class="option-text">
+          <span class="option-label">Bold &amp; adventurous</span>
+          <span class="option-desc">I know what I want and I want more of it</span>
+        </span>
+      </button>
+    </div>
+    <button class="next-btn" id="next2" onclick="showResult()">See my match &rarr;</button>
+  </div>
+ 
+  <!-- Result -->
+  <div id="resultCard" class="result-card">
+    <div class="result-badge">Your Match</div>
+    <div class="result-emoji" id="resultEmoji"></div>
+    <h3 class="result-name" id="resultName"></h3>
+    <p class="result-desc" id="resultDesc"></p>
+    <a id="resultLink" class="result-link" href="#" target="_blank">Shop Now</a>
+    <button class="restart-btn" onclick="restart()">Start over</button>
+  </div>
+</div>
+ 
+<script>
+  var answers = { q1: null, q2: null };
+ 
+  var products = {
+    chewy_gentle: {
+      emoji: '🍫',
+      name: "Andy's THC Brownie Bites",
+      desc: "Fudgy, rich, and perfectly portioned. Each bite packs 10mg Delta-9 THC and 10mg CBD — a great starting point for a comfortable, enjoyable experience.",
+      url: "https://mood.com/product/andys-thc-brownie-bites",
+      cta: "Shop Brownie Bites"
+    },
+    chewy_bold: {
+      emoji: '🌿',
+      name: "Andy's Mindful Keto Brownie Bites",
+      desc: "All the fudgy richness you love, built for people who know exactly what they want. Keto-friendly, no added sugars, and available in bigger packs for the seasoned enthusiast.",
+      url: "https://mood.com/product/andy-s-mindful-brownie-bites",
+      cta: "Shop Mindful Bites"
+    },
+    crunchy_gentle: {
+      emoji: '✨',
+      name: "Andy's THC Chocolate Crunch",
+      desc: "Dark chocolate, marshmallows, and rice cereal in every bite. The 10mg option is a great way to ease into a crunchy, snackable cannabis experience.",
+      url: "https://mood.com/product/andys-thc-chocolate-crunch",
+      cta: "Shop Chocolate Crunch"
+    },
+    crunchy_bold: {
+      emoji: '🍿',
+      name: "Delta-9 THC Chocolate Popcorn",
+      desc: "Small-batch popcorn drenched in decadent chocolate — and loaded with 100mg Delta-9 THC per bag. For the adventurous snacker who means business.",
+      url: "https://mood.com/product/delta-9-thc-chocolate-popcorn-100mg",
+      cta: "Shop Chocolate Popcorn"
+    },
+    sippable_gentle: {
+      emoji: '☕',
+      name: "Sleep Hot Cocoa — 15mg",
+      desc: "A cozy mug of cocoa with 15mg fast-acting Delta-9 THC, CBN, CBD, and calming herbs. Perfect for easing into a relaxed, restful night.",
+      url: "https://mood.com/product/sleep-hot-cocoa",
+      cta: "Shop Sleep Hot Cocoa"
+    },
+    sippable_bold: {
+      emoji: '🌙',
+      name: "Sleep Hot Cocoa — 30mg",
+      desc: "The stronger version of our fan-favorite cocoa. 30mg fast-acting Delta-9 THC plus CBN, CBD, ashwagandha, and L-theanine. Ready to wind down properly.",
+      url: "https://mood.com/product/sleep-hot-cocoa",
+      cta: "Shop Sleep Hot Cocoa"
+    }
+  };
+ 
+  function selectOption(step, value, btn) {
+    var parent = btn.parentElement;
+    var siblings = parent.querySelectorAll('.option-btn');
+    siblings.forEach(function(b) { b.classList.remove('selected'); });
+    btn.classList.add('selected');
+ 
+    if (step === 1) {
+      answers.q1 = value;
+      document.getElementById('next1').classList.add('visible');
+    } else {
+      answers.q2 = value;
+      document.getElementById('next2').classList.add('visible');
+    }
+  }
+ 
+  function goToStep2() {
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    document.getElementById('progressFill').style.width = '50%';
+  }
+ 
+  function showResult() {
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('step2').style.display = 'none';
+ 
+    var key = answers.q1 + '_' + answers.q2;
+    var product = products[key];
+ 
+    document.getElementById('resultEmoji').textContent = product.emoji;
+    document.getElementById('resultName').textContent = product.name;
+    document.getElementById('resultDesc').textContent = product.desc;
+    var link = document.getElementById('resultLink');
+    link.href = product.url;
+    link.textContent = product.cta;
+ 
+    document.getElementById('resultCard').classList.add('visible');
+  }
+ 
+  function restart() {
+    answers = { q1: null, q2: null };
+ 
+    document.getElementById('resultCard').classList.remove('visible');
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step1').style.display = 'block';
+    document.getElementById('progressFill').style.width = '0%';
+ 
+    document.querySelectorAll('.option-btn').forEach(function(b) {
+      b.classList.remove('selected');
+    });
+    document.getElementById('next1').classList.remove('visible');
+    document.getElementById('next2').classList.remove('visible');
+  }
+</script>
+ 
+</body>
+</html>
